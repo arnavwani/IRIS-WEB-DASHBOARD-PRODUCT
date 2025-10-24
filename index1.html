@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IRIS Student Dashboard</title>
+<style>
+/* Reset and base styles */
+body {
+  margin: 0; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+  background: #f5f6fa; 
+  color: #22223a;
+  font-size: 16px;
+  line-height: 1.6;
+}
+a, a:visited {
+  color: #22223a; 
+  text-decoration: none;
+}
+a:hover, a:focus {
+  text-decoration: underline;
+}
+ul {
+  margin: 0; 
+  padding: 0; 
+  list-style: none;
+}
+button {
+  font-family: inherit; 
+  cursor: pointer; 
+  border: none; 
+  background: none; 
+  font-weight: 600; 
+  font-size: 1.1em;
+  color: #e7e9ff;
+  padding: 8px 18px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+button:focus {
+  outline: 2px solid #514d8a;
+  outline-offset: 2px;
+}
+
+/* Header */
+header {
+  background: #2f2f5b;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  user-select: none;
+}
+.logo {
+  font-family: monospace;
+  font-size: 2.7rem;
+  letter-spacing: 0.8rem;
+  font-weight: 800;
+  color: #e7e9ff;
+  background: #383973;
+  border-radius: 6px;
+  padding: 6px 40px 6px 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.3s ease;
+}
+.logo:hover {
+  background-color: #4d50ab;
+}
+.nav {
+  display: flex;
+  gap: 28px;
+  font-weight: 600;
+  color: #e7e9ff;
+  position: relative;
+  user-select: none;
+}
+.nav-item {
+  position: relative;
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+.nav-item:hover, .nav-item.active {
+  background-color: #514d8a;
+  color: #f4f7ff;
+}
+
+/* Dropdown menus */
+.dropdown-menu {
+  position: absolute;
+  top: 42px;
+  left: 0;
+  background: #515282;
+  border-radius: 8px;
+  min-width: 230px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  z-index: 999;
+  display: none;
+  flex-direction: column;
+  user-select: none;
+}
+.dropdown-menu.show {
+  display: flex;
+}
+.dropdown-item {
+  padding: 10px 18px;
+  color: #d3d3f4;
+  font-weight: 500;
+  border-bottom: 1px solid #3f3e6e;
+  cursor: default;
+}
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+.dropdown-item:hover {
+  background: #6868bf;
+  color: #fff;
+}
+
+/* Search Button & Box */
+#searchBtn {
+  font-size: 20px;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+#searchBox {
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  font-size: 15px;
+  padding: 0 12px;
+  margin-left: 12px;
+  outline: none;
+  box-shadow: 0 0 5px rgba(81,77,138,0.6);
+  display: none;
+  max-width: 170px;
+  transition: width 0.3s ease-in-out;
+}
+
+/* Header right items */
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  user-select: none;
+}
+.icon-btn {
+  font-size: 22px;
+  color: #e7e9ff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+.icon-btn:hover,
+.icon-btn:focus {
+  background-color: #514d8a;
+  color: #f1f4ff;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Profile circle */
+.profile {
+  width: 40px;
+  height: 40px;
+  background-color: #b7b7cd;
+  border-radius: 10px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #373759;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 2px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.profile:hover, .profile:focus {
+  background-color: #8e8ebb;
+  color: #f4f7ff;
+  outline: none;
+}
+
+/* Notification Box & Profile Menu */
+.notification-box,
+.profile-menu {
+  position: absolute;
+  background: #fefefe;
+  top: 55px;
+  right: 0;
+  border-radius: 8px;
+  padding: 14px 22px;
+  min-width: 240px;
+  box-shadow: 0 3px 7px rgba(0,0,0,0.15);
+  color: #22223a;
+  font-weight: 600;
+  font-size: 0.95em;
+  user-select: none;
+  display: none;
+  z-index: 999;
+}
+.notification-box.show,
+.profile-menu.show {
+  display: block;
+}
+.profile-menu .menu-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  font-weight: 600;
+  color: #41415e;
+}
+.profile-menu .menu-item:last-child {
+  border-bottom: none;
+}
+.profile-menu .menu-item:hover {
+  background-color: #edeef9;
+}
+
+/* Main Container */
+.container {
+  display: flex;
+  padding: 36px 48px 40px 48px;
+  gap: 64px;
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+/* Sidebar left */
+.sidebar {
+  flex: 0 0 360px;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+.greeting {
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 24px;
+}
+.info-box {
+  background-color: #dadaf4;
+  box-shadow: 0 2px 10px rgba(81,77,138,0.15);
+  border-radius: 12px;
+  padding: 18px 28px;
+  margin-bottom: 26px;
+  font-weight: 600;
+  font-size: 1.22rem;
+  color: #514d8a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.info-box .value {
+  font-weight: 900;
+  font-size: 2.4rem;
+  color: #35335d;
+}
+.quick-links {
+  margin-top: auto;
+}
+.quick-links h3 {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #535387;
+  margin-bottom: 12px;
+  user-select: none;
+}
+.quick-links ul li {
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #29294d;
+}
+.quick-links ul li a {
+  transition: color 0.2s ease;
+}
+.quick-links ul li a:hover, 
+.quick-links ul li a:focus {
+  color: #514d8a;
+  outline: none;
+  text-decoration: underline;
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 22px;
+  margin-bottom: 28px;
+}
+.tab-btn {
+  font-weight: 700;
+  background-color: #514d8a;
+  padding: 12px 28px;
+  border-radius: 10px;
+  color: #edefef;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  font-size: 1.12rem;
+  box-shadow: 1px 2px 6px rgba(81,77,138,0.3);
+}
+.tab-btn:hover,
+.tab-btn:focus {
+  background-color: #6462a3;
+  outline: none;
+}
+.tab-btn.inactive {
+  background-color: #ababd1;
+  color: #4b4b6f;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Content Boxes */
+.content-box {
+  background-color: #ffffff;
+  box-shadow: 0 2px 14px rgba(81,77,138,0.1);
+  border-radius: 14px;
+  padding: 32px;
+  min-height: 240px;
+  max-width: 960px;
+  color: #3a3a55;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.content-item {
+  display: none;
+}
+.content-item.active {
+  display: block;
+}
+.content-item h2 {
+  font-weight: 800;
+  font-size: 1.3rem;
+  margin-bottom: 16px;
+  color: #242444;
+}
+.content-item ul {
+  margin-left: 18px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #444466;
+}
+
+/* Timetable Table */
+.content-item table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.content-item table td {
+  border-bottom: 1.5px solid #e3e3f6;
+  padding: 12px 0;
+  color: #535387;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+    padding: 24px 20px;
+    gap: 36px;
+  }
+  .sidebar {
+    width: 100%;
+    padding: 0;
+    flex: none;
+  }
+  .main-content {
+    width: 100%;
+  }
+  .logo {
+    padding: 6px 20px 6px 12px;
+    font-size: 2rem;
+    letter-spacing: 0.4rem;
+  }
+  header {
+    gap: 20px;
+    padding: 12px 16px;
+  }
+  .nav {
+    gap: 16px;
+    font-size: 0.95rem;
+  }
+  .tab-btn {
+    padding: 8px 20px;
+    font-size: 1rem;
+  }
+  .content-box {
+    padding: 24px 18px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Utility */
+.hidden {
+  display: none !important;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" id="logoBtn" tabindex="0" aria-label="Go to dashboard">IRIS</div>
+  <nav class="nav" role="menubar" aria-label="Primary navigation">
+    <div class="nav-item" id="navAcademics" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-controls="dropdownAcademics">Academics ▾</div>
+    <div class="nav-item" id="navInstitute" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-controls="dropdownInstitute">Institute ▾</div>
+    <div class="nav-item" id="navCampus" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-controls="dropdownCampus">Campus ▾</div>
+    <div class="nav-item" id="navAlumni" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-controls="dropdownAlumni">Alumni ▾</div>
+    <div class="nav-item" id="searchBtn" tabindex="0" aria-label="Search">&#128269;</div>
+
+    <!-- Dropdown Menus -->
+    <div class="dropdown-menu" id="dropdownAcademics" role="menu" aria-label="Academics menu">
+      <div class="dropdown-item" role="menuitem" tabindex="0">Courses and exam grades</div>
+      <div class="dropdown-item" role="menuitem" tabindex="0">Course registration</div>
+      <div class="dropdown-item" role="menuitem" tabindex="0">Credits tracker</div>
+      <div class="dropdown-item" role="menuitem" tabindex="0">Attendance card</div>
+    </div>
+    <div class="dropdown-menu" id="dropdownInstitute" role="menu" aria-label="Institute menu">
+      <div class="dropdown-item" role="menuitem" tabindex="0">No Dues</div>
+      <div class="dropdown-item" role="menuitem" tabindex="0">Branch change</div>
+      <div class="dropdown-item" role="menuitem" tabindex="0">Fees payment</div>
+    </div>
+    <div class="dropdown-menu" id="dropdownCampus" role="menu" aria-label="Campus menu">
+      <div class="dropdown-item" role="menuitem" tabindex="0">Hostel dashboard</div>
+      <div class="dropdown-item" role="menuitem" tabindex="0">Mess complaints</div>
+      <div class="dropdown-item" role="menuitem" tabindex="0">Hostel complaints</div>
+      <div class="dropdown-item" role="menuitem" tabindex="0">Mess menu</div>
+    </div>
+    <div class="dropdown-menu" id="dropdownAlumni" role="menu" aria-label="Alumni menu">
+      <div class="dropdown-item" role="menuitem" tabindex="0">Donation</div>
+      <div class="dropdown-item" role="menuitem" tabindex="0">Directory</div>
+    </div>
+  </nav>
+
+  <div class="header-right">
+    <button class="icon-btn" id="notifBtn" aria-label="Notifications">&#128276;</button>
+    <div class="profile" id="profileBtn" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-controls="profileBox">A</div>
+    <input type="text" id="searchBox" placeholder="Search..." aria-label="Search input" />
+    <!-- Notification and profile dropdowns -->
+    <div class="notification-box" id="notifBox" role="alert" aria-live="polite">No new notifications</div>
+    <div class="profile-menu" id="profileBox" role="menu" aria-label="Profile menu">
+      <div class="menu-item" tabindex="0" aria-label="User name">Name: Arnav Wani</div>
+      <div class="menu-item" tabindex="0">Settings</div>
+      <div class="menu-item" tabindex="0">Theme</div>
+      <div class="menu-item" tabindex="0" id="logoutBtn">Log Out</div>
+    </div>
+  </div>
+</header>
+
+<div class="container" role="main">
+
+  <aside class="sidebar">
+    <div class="greeting" role="heading" aria-level="2">Good morning,<br><strong>Arnav!</strong></div>
+    <div class="info-box" aria-label="Major Credits">
+      Major Credits <span class="value">44</span>
+    </div>
+    <div class="info-box" aria-label="Major CGPA">
+      Major CGPA <span class="value">9.55</span>
+    </div>
+    <div class="info-box" aria-label="Semester">
+      Semester <span class="value">3rd</span>
+    </div>
+
+    <div class="quick-links" aria-label="Quick links">
+      <h3>Quick links</h3>
+      <ul>
+        <li><a href="#">Login to Moodle</a></li>
+        <li><a href="#">IRIS Blog</a></li>
+        <li><a href="#">Terms of Services</a></li>
+        <li><a href="#">Contact Advisor</a></li>
+        <li><a href="#">Academic Calendar</a></li>
+        <li><a href="#">Mess Feedback</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <section class="main-content" aria-label="Main content area">
+    <nav class="tabs" role="tablist" aria-label="Primary content sections">
+      <button role="tab" aria-selected="true" aria-controls="announcements" id="tabAnnouncements" class="tab-btn">Announcements</button>
+      <button role="tab" aria-selected="false" aria-controls="courses" id="tabCourses" class="tab-btn">Courses</button>
+      <button role="tab" aria-selected="false" aria-controls="attendance" id="tabAttendance" class="tab-btn">Attendance</button>
+      <button role="tab" aria-selected="false" aria-controls="dues" id="tabDues" class="tab-btn">Dues</button>
+      <button role="tab" aria-selected="false" aria-controls="timetable" id="tabTimeTable" class="tab-btn">Time Table</button>
+    </nav>
+
+    <div class="content-box">
+      <section id="announcements" class="content-item active" role="tabpanel" tabindex="0" aria-labelledby="tabAnnouncements">
+        <h2>Notice</h2>
+        <p>Notice for Mega Mess students</p>
+      </section>
+
+      <section id="courses" class="content-item" role="tabpanel" tabindex="0" aria-labelledby="tabCourses">
+        <h2>My Courses this Semester</h2>
+        <ul>
+          <li>Data Structures</li>
+          <li>DBMS</li>
+          <li>COA Lab</li>
+        </ul>
+      </section>
+
+      <section id="attendance" class="content-item" role="tabpanel" tabindex="0" aria-labelledby="tabAttendance">
+        <h2>Attendance Percentage</h2>
+        <ul>
+          <li>Data Structures: 85%</li>
+          <li>DBMS: 78%</li>
+          <li>COA Lab: 88%</li>
+        </ul>
+      </section>
+
+      <section id="dues" class="content-item" role="tabpanel" tabindex="0" aria-labelledby="tabDues">
+        <h2>Outstanding Dues</h2>
+        <p>Data Structures Assignment due 25 Oct, 2025</p>
+      </section>
+
+      <section id="timetable" class="content-item" role="tabpanel" tabindex="0" aria-labelledby="tabTimeTable">
+        <h2>Wednesday Schedule</h2>
+        <table style="width:100%; border-collapse:collapse;">
+          <tbody>
+          <tr><td>8:00 – 8:45</td></tr>
+          <tr><td>9:00 – 9:45</td></tr>
+          <tr><td>10:00 – 10:45</td></tr>
+          <tr><td>11:00 – 11:45</td></tr>
+          <tr><td>13:00 – 13:45</td></tr>
+          <tr><td>14:00 – 14:45</td></tr>
+          <tr><td>15:00 – 15:45</td></tr>
+          <tr><td>16:00 – 16:45</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Utility functions to close all dropdowns
+  const closeAllDropdowns = () => {
+    document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
+  };
+
+  const closeProfileNotif = () => {
+    document.getElementById('profileBox').classList.remove('show');
+    document.getElementById('notifBox').classList.remove('show');
+  };
+
+  // Toggle dropdowns for nav items
+  const dropdownMapping = {
+    navAcademics: 'dropdownAcademics',
+    navInstitute: 'dropdownInstitute',
+    navCampus: 'dropdownCampus',
+    navAlumni: 'dropdownAlumni',
+  };
+
+  Object.keys(dropdownMapping).forEach(navId => {
+    const navEl = document.getElementById(navId);
+    const menuEl = document.getElementById(dropdownMapping[navId]);
+
+    navEl.addEventListener('click', () => {
+      const isOpen = menuEl.classList.contains('show');
+      closeAllDropdowns();
+      closeProfileNotif();
+      if (!isOpen) {
+        menuEl.classList.add('show');
+        navEl.setAttribute('aria-expanded', 'true');
+      } else {
+        menuEl.classList.remove('show');
+        navEl.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
+  // Hide dropdowns when clicking outside
+  window.addEventListener('click', e => {
+    if (!e.target.closest('.nav-item')) closeAllDropdowns();
+    if (!e.target.closest('#profileBtn')) {
+      document.getElementById('profileBox').classList.remove('show');
+      document.getElementById('profileBtn').setAttribute('aria-expanded', 'false');
+    }
+    if (!e.target.closest('#notifBtn')) {
+      document.getElementById('notifBox').classList.remove('show');
+      document.getElementById('notifBtn').setAttribute('aria-expanded', 'false');
+    }
+    if (!e.target.closest('#searchBtn') && !e.target.closest('#searchBox')) {
+      document.getElementById('searchBox').style.display = 'none';
+    }
+  });
+
+  // Logo click scrolls to top or dashboard
+  document.getElementById('logoBtn').addEventListener('click', () => {
+    // For demo just scroll top or you can redirect here
+    window.scrollTo({top:0, behavior: 'smooth'});
+  });
+
+  // Notifications toggle
+  document.getElementById('notifBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    const box = document.getElementById('notifBox');
+    const isVisible = box.classList.contains('show');
+    closeAllDropdowns();
+    closeProfileNotif();
+    box.classList.toggle('show', !isVisible);
+    document.getElementById('notifBtn').setAttribute('aria-expanded', !isVisible);
+  });
+
+  // Profile toggle
+  document.getElementById('profileBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    const box = document.getElementById('profileBox');
+    const isVisible = box.classList.contains('show');
+    closeAllDropdowns();
+    document.getElementById('notifBox').classList.remove('show');
+    box.classList.toggle('show', !isVisible);
+    document.getElementById('profileBtn').setAttribute('aria-expanded', !isVisible);
+  });
+
+  // Search toggle
+  document.getElementById('searchBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    const box = document.getElementById('searchBox');
+    box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    if (box.style.display === 'block') box.focus();
+    closeAllDropdowns();
+    closeProfileNotif();
+  });
+
+  // Tab controls for content switching
+  const tabs = [
+    {btnId: 'tabAnnouncements', contentId: 'announcements'},
+    {btnId: 'tabCourses', contentId: 'courses'},
+    {btnId: 'tabAttendance', contentId: 'attendance'},
+    {btnId: 'tabDues', contentId: 'dues'},
+    {btnId: 'tabTimeTable', contentId: 'timetable'},
+  ];
+  tabs.forEach(({btnId, contentId}) => {
+    const btn = document.getElementById(btnId);
+    const content = document.getElementById(contentId);
+    btn.addEventListener('click', () => {
+      // Switch tab selected states
+      tabs.forEach(({btnId: bId, contentId: cId}) => {
+        document.getElementById(bId).classList.remove('inactive');
+        document.getElementById(bId).setAttribute('aria-selected', 'false');
+        document.getElementById(cId).classList.remove('active');
+      });
+      btn.classList.add('inactive');
+      btn.setAttribute('aria-selected', 'true');
+      content.classList.add('active');
+    });
+  });
+
+  // Default to Announcements active tab on load
+  window.onload = () => {
+    document.getElementById('tabAnnouncements').click();
+  };
+</script>
+
+</body>
+</html>
+
